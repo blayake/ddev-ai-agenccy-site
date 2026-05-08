@@ -1,0 +1,41 @@
+{
+  "summary": "Refactor regression: Blayake.jsx split into 10 sub-components verified at desktop 1920x1080. Backend 7/7 pytest pass; frontend 100% pass — all 41 data-testids preserved, 0 console errors, 0 React key warnings, all interactions (custom cursor, services/work dim, FAQ accordion, contact form e2e + Mongo persistence, hero/reel parallax) functional after refactor.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_blayake_api.py",
+    "/app/test_reports/pytest/iteration_5.xml"
+  ],
+  "verified_checks": {
+    "backend_pytest": "7/7 PASSED — health, lead create (+phone+message), required-only, invalid email 422, missing name 422, missing email 422, list-leads sorted desc + no _id + phone present",
+    "all_testids_present": "41/41 (site-header, brand-logo, nav-work/services/contact, header-cta-book, availability-badge, hero-cta-start/work, hero-visual, scroll-progress, services-index, service-row-01..05, services-cta, studio-reel, reel-cta, work-row-0..3, faq-toggle-0..2, contact-email/x/form, form-name/email/phone/message/submit/status, footer-x/linkedin/instagram/email, cursor-dot, cursor-ring)",
+    "console_errors": 0,
+    "react_key_warnings": 0,
+    "services_dim_hover_02": "[01:0.25, 02:1, 03:0.25, 04:0.25, 05:0.25] — works",
+    "work_dim_hover_1": "[0:0.3, 1:1, 2:0.3, 3:0.3] — works",
+    "cursor_ring_on_service": "text='DISCOVER', transform scale 3.4 — exact spec",
+    "cursor_ring_on_work": "text='VIEW' — works",
+    "cursor_ring_on_button": "transform scale 1.8 on hero-cta-start hover — exact spec",
+    "faq_default_open": "faq-toggle-0 aria-expanded=true at load",
+    "faq_toggle_close": "click faq-0 -> aria-expanded=false",
+    "faq_toggle_open": "click faq-1 -> aria-expanded=true",
+    "contact_form_e2e": "submit -> form-status='GOT IT. WE\\'LL BE IN TOUCH WITHIN 24 HOURS.' + name/email cleared; lead persisted in Mongo with id, phone='+1 555 123 9999', message; verified via GET /api/leads",
+    "hero_parallax_y": "img transform: 'none' at scrollY=0 -> matrix(1.067,0,0,1.067,0,100) at scrollY=600 — vertical parallax + scale works",
+    "reel_title_parallax_x": "BUILT IN PUBLIC translateX: -177.19px -> -330.32px after scroll — horizontal parallax works",
+    "marquee_keys_stable": "no React 'unique key' console warnings emitted"
+  },
+  "critical_code_review_comments": [
+    "Composer Blayake.jsx is now 77 lines (was 894) — clean separation. All section files <200 lines, follows file-size guideline.",
+    "Stable IDs adopted in WORK (id), FAQ (id), SOCIALS (id) and Marquee uses `${label}-s${stream}-${i}` — index-as-key removed.",
+    "Backend type hints added without behaviour changes; 7/7 tests still pass.",
+    "Minor: SERVICES array still uses `n` (numeric string) as identity — fine since 5 stable items, but could also expose an explicit `id` for symmetry."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (7/7)", "frontend": "100%"},
+  "test_credentials": "n/a",
+  "seed_data_creation": "Created test leads (TEST_Alice, TEST_Bob, TEST_Eve, TEST_PWUser_*) via pytest + playwright contact-form e2e — TEST_-prefixed for easy cleanup",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Refactor iteration verified end-to-end. Use desktop 1920x1080. For service/work dim hover tests, scroll the section into view first then mouse.move in steps=10 (otherwise hover events don't reliably fire on first move). Lenis smooth-scroll requires ~1500ms wait after window.scrollTo({behavior:'instant'}) for framer-motion useScroll/useTransform values to settle. Backend BASE_URL via REACT_APP_BACKEND_URL.",
+  "rca_of_the_issue": "n/a — no bugs."
+}
