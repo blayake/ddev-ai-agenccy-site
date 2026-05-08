@@ -1,0 +1,161 @@
+{
+  "theme": "Dark",
+  "archetype": "4 (Swiss & High-Contrast with an Editorial Tech Twist)",
+  "color_palette": {
+    "background": "#0F0F0F",
+    "surface": "#1A1A1A",
+    "surface_glass": "rgba(26, 26, 26, 0.7)",
+    "primary": "#FF5722",
+    "primary_hover": "#FF784E",
+    "text_primary": "#F2EFE9",
+    "text_secondary": "#A3A3A3",
+    "border": "#333333"
+  },
+  "typography": {
+    "fonts": [
+      {
+        "family": "Cabinet Grotesk",
+        "url": "https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,500,700,400,900&display=swap",
+        "usage": "Headings (H1, H2, H3) - Authoritative, brutalist yet elegant"
+      },
+      {
+        "family": "JetBrains Mono",
+        "url": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap",
+        "usage": "Overlines, labels, small tech specs, stats numbers - Engineer feel"
+      },
+      {
+        "family": "Manrope",
+        "url": "https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap",
+        "usage": "Body text - Clean, highly readable geometric sans"
+      }
+    ],
+    "scales": {
+      "h1": "text-5xl md:text-6xl+ lg:text-7xl font-black tracking-tighter leading-none",
+      "h2": "text-4xl md:text-5xl font-bold tracking-tight leading-tight",
+      "h3": "text-2xl md:text-3xl font-bold tracking-tight",
+      "overline": "text-xs md:text-sm font-mono uppercase tracking-[0.2em] text-[#FF5722]",
+      "body": "text-base md:text-lg font-normal leading-relaxed text-[#A3A3A3]"
+    }
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous spacing. Avoid standard centered columns. Embrace asymmetry and The Bento Grid (Tetris Mode A).",
+    "container": "max-w-7xl mx-auto px-6 md:px-12",
+    "section_gap": "py-24 md:py-32",
+    "grid_bento": "grid grid-cols-1 md:grid-cols-12 gap-8"
+  },
+  "motion_and_interaction": {
+    "scrolling": "Lenis smooth scroll is MANDATORY for weight and premium feel.",
+    "hover_states": "Buttons lift (-translate-y-1), borders glow faintly with primary color.",
+    "reveal": "Framer Motion staggered reveals on scroll (opacity 0 -> 1, y: 20 -> 0)."
+  },
+  "components_strategy": {
+    "buttons": "Square or very slightly rounded (rounded-sm). High contrast. Primary: Tangerine background with black text. Secondary: Transparent with tangerine border and white text.",
+    "cards": "Minimalist 'Tracing Beam' or subtle 'Glassmorphism' on dark backgrounds. 1px borders (#333333).",
+    "navigation": "Sticky glass header (backdrop-blur-xl bg-[#0F0F0F]/70) with 1px bottom border. Left-aligned logo, right-aligned CTA.",
+    "forms": "Shadcn based. Dark inputs, 1px borders, tangerine focus rings."
+  },
+  "sections_blueprint": [
+    {
+      "name": "Header",
+      "layout": "Sticky top, crystal glassmorphism, flexible row.",
+      "content": "Logo 'BLAYAKE' in Cabinet Grotesk, Nav links, 'Book a Call' primary button."
+    },
+    {
+      "name": "Hero",
+      "layout": "Grid 12-col. Left 7 cols: Content. Right 5 cols: Large abstract visual.",
+      "content": "Overline: 'AI SYSTEMS AGENCY'. H1: 'We engineer autonomous growth.' Body: 'Stop doing manual work. We build bespoke AI systems that scale your operations, create content, and close deals 24/7.' CTAs: 'Book a Call' & 'Explore Work'. Right: Black/Orange abstract glass image."
+    },
+    {
+      "name": "Marquee",
+      "layout": "Full width, slow scroll, JetBrains Mono font.",
+      "content": "AI AUTOMATION + CUSTOM LLMS + PREDICTIVE ANALYTICS + WORKFLOW OPTIMIZATION"
+    },
+    {
+      "name": "Services / Capabilities",
+      "layout": "Bento Grid (Tetris Mode). 4 cards.",
+      "content": "AI Automation (col-span-8), AI Content Systems (col-span-4), Custom AI Chatbots (col-span-4), Web Development (col-span-8). Dark cards with 1px border. Hover effect: subtle orange glow."
+    },
+    {
+      "name": "Stats",
+      "layout": "Asymmetrical 3-column flex or grid.",
+      "content": "150+ Projects (col), 98% Satisfaction (col), 10x Automation (col). Numbers in huge JetBrains Mono text-primary, labels in Manrope text-secondary."
+    },
+    {
+      "name": "Process",
+      "layout": "Grid Borders ('Technical Look'). 4 columns on desktop, 1 on mobile.",
+      "content": "Discover -> Design -> Build -> Deploy. Border-r and border-b for separation."
+    },
+    {
+      "name": "Case Studies",
+      "layout": "Vertical stacked list with hover image reveal (editorial portfolio style), or a simple 2-column grid.",
+      "content": "3 Case Studies highlighting the problem/solution. Use the abstract data images as covers."
+    },
+    {
+      "name": "Testimonials",
+      "layout": "Horizontal scroll or standard 3-column grid.",
+      "content": "3 Testimonials emphasizing ROI and automation success. Use professional avatars."
+    },
+    {
+      "name": "FAQ",
+      "layout": "Narrow container (max-w-3xl mx-auto).",
+      "content": "Shadcn Accordion. 1px bottom border, no background."
+    },
+    {
+      "name": "Contact / Book a Call",
+      "layout": "Grid 12-col. Left 5 cols: 'Ready to Automate?' massive text. Right 7 cols: Shadcn Form connected to MongoDB.",
+      "content": "Form fields: Name, Email, Company, Pain Point. Submit button."
+    },
+    {
+      "name": "Footer",
+      "layout": "Massive bottom padding. Huge typography.",
+      "content": "Left: Links. Bottom: 'BLAYAKE' taking up full width in text-[15vw] Cabinet Grotesk font."
+    }
+  ],
+  "media": {
+    "image_urls": [
+      {
+        "category": "Hero Background/Visual",
+        "description": "Abstract black and orange glass geometry to fit the high-contrast editorial tech theme.",
+        "url": "https://images.unsplash.com/photo-1689028294160-e78a88abcb19?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTZ8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGdlb21ldHJ5JTIwZ2xhc3N8ZW58MHx8fHwxNzc4MjI5ODQ2fDA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "Case Study 1",
+        "description": "Abstract minimalist data visualization",
+        "url": "https://images.unsplash.com/photo-1773236376238-bde8e75c7506?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHw0fHxtaW5pbWFsaXN0JTIwZGF0YSUyMHZpc3VhbGl6YXRpb258ZW58MHx8fHwxNzc4MjI5ODQ2fDA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "Case Study 2",
+        "description": "Modern dark server rack",
+        "url": "https://images.unsplash.com/photo-1680992046626-418f7e910589?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzZXJ2ZXIlMjByb29tfGVufDB8fHx8MTc3ODIyOTg0Nnww&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "Case Study 3",
+        "description": "Abstract wave lines",
+        "url": "https://images.unsplash.com/photo-1765046255479-669cf07a0230?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwZGF0YSUyMHZpc3VhbGl6YXRpb258ZW58MHx8fHwxNzc4MjI5ODQ2fDA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "Testimonial Avatar 1",
+        "description": "Professional man in suit",
+        "url": "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NjZ8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NzgyMjk4NDF8MA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "Testimonial Avatar 2",
+        "description": "Professional woman in gray jacket",
+        "url": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NjZ8MHwxfHNlYXJjaHwyfHxwcm9mZXNzaW9uYWwlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NzgyMjk4NDF8MA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "Testimonial Avatar 3",
+        "description": "Professional woman focused",
+        "url": "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NjZ8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NzgyMjk4NDF8MA&ixlib=rb-4.1.0&q=85"
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "CRITICAL: Do not use generic Inter, Roboto, or Space Grotesk. Add Cabinet Grotesk, JetBrains Mono, and Manrope links to index.html and configure in Tailwind.",
+    "CRITICAL: Do not use purple/blue gradients or generic 'tech' blues. Stick strictly to the Obsidian/Charcoal and Tangerine (#FF5722) palette.",
+    "CRITICAL: Avoid standard centered columns. Embrace asymmetry (e.g. text left, image right, bento grid sizes mixed 8-4/4-8).",
+    "Ensure Lenis smooth scroll is implemented for the premium high-end feel.",
+    "Add 'data-testid' to all buttons, links, and form inputs for testing.",
+    "Ensure backend integration uses standard fetch/axios calls for the MongoDB-connected 'Book a Call' form."
+  ]
+}
