@@ -1,0 +1,34 @@
+{
+  "summary": "Frontend-only regression + new Services hover-reveal index testing on Blayake landing page. 5 service rows, titles, data-cursor + data-cursor-label attributes, blurb expansion on hover, click→#contact, services-cta, custom cursor DISCOVER label, and full regression of Hero/Marquee/Work/FAQ/Contact (with Phone)/Footer all verified. ONE BUG FOUND: the 'dim other rows' visual effect is broken — opacity-30 class is applied but Framer Motion sets inline style.opacity=1 which overrides Tailwind class, so non-active rows do NOT visibly dim.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Services hover-reveal index (Blayake.jsx Services component, lines ~263-288)",
+        "issue": "Hovering a service row does NOT visibly dim the other rows. The conditional Tailwind class (`dim ? 'opacity-30' : 'opacity-100'`) IS applied on className, but Framer Motion's `whileInView={{ opacity: 1 }}` sets `style.opacity: 1` INLINE on the same <motion.button>, which has higher CSS specificity than the Tailwind utility class. Confirmed via getComputedStyle: r1.className contains 'opacity-30' but r1.style.opacity == '1' and computed opacity == '1'. This breaks the core requested UX: 'Hovering a row dims the others'.",
+        "selector": "[data-testid^='service-row-']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/test_reports/iteration_3.json"],
+  "action_items": [
+    "Fix dim effect in /app/frontend/src/pages/Blayake.jsx Services component. Recommended: drive opacity through Framer Motion's animate prop instead of the className utility, e.g. replace `whileInView={{ opacity: 1, y: 0 }}` + className `${dim ? 'opacity-30' : 'opacity-100'}` with a combined motion control. One simple fix: keep whileInView for entry animation, then add `animate={{ opacity: dim ? 0.3 : 1 }}` (animate overrides whileInView post-entry). Alternatively switch to inline style: `style={{ opacity: dim ? 0.3 : 1 }}` and remove whileInView opacity, using only `animate={{ y: 0 }}`."
+  ],
+  "critical_code_review_comments": [
+    "Inline style from Framer Motion (whileInView/animate) overrides Tailwind opacity utility classes — anti-pattern when both target the same property. Always drive a single property through one mechanism.",
+    "The cursor-following preview image inside services-index uses absolute positioning with `top:0;left:0` and translateX/Y -50% — works as intended, but consider clamping x/y to container bounds to avoid the image clipping when the cursor is near container edges.",
+    "Services component `onMouseLeave={() => setActive(null)}` is on the wrapper; rapid hover transitions between rows briefly clear active state. Minor — current behavior is acceptable.",
+    "All other elements (cursor-dot, cursor-ring, DISCOVER label rendering, click→scrollIntoView, blurb expansion via AnimatePresence) work correctly."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "skipped (not requested)", "frontend": "95% (1 visual bug — dim effect broken)"},
+  "test_credentials": "n/a",
+  "seed_data_creation": "none",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Verified items on desktop 1920x1080: services-index container exists; all 5 rows (01..05) render with exact titles Website Creation/SaaS Development/Short-Form Content/AI Video Ads/Copywriting; each has data-cursor='view' and data-cursor-label='Discover'; hovering row-02 expands blurb with 'Full SaaS platforms...' text (visible=True); cursor ring shows 'DISCOVER' label on hover (innerText='DISCOVER'); cursor-dot + cursor-ring mount; clicking row-02 scrolls #contact into view; services-cta 'Brief us on yours' exists and scrolls to #contact; Hero h1, hero-cta-start, marquee, work-row-0, faq-toggle-0, form-phone all render; footer-x textContent='@blayake on X', footer-email textContent='teamblayake.agency@gmail.com'. Only failing assertion: row-01 computed opacity stays at 1 even when className includes opacity-30, due to Framer Motion inline style override. No console errors observed. Backend not tested (per request).",
+  "rca_of_the_issue": "Root cause: <motion.button> in Services has BOTH `whileInView={{ opacity: 1, y: 0 }}` (sets inline style.opacity=1 once row scrolls into viewport) AND className with conditional `opacity-30`/`opacity-100`. CSS specificity: inline style > class. Once whileInView fires (viewport={{ once: true }}), opacity is permanently locked at 1 inline, so toggling Tailwind's opacity-30 class has zero visual effect. Reproduction: open desktop, hover any service row — verify other rows visually unchanged. Mitigation: drive opacity exclusively through Framer Motion (e.g., `animate={{ opacity: dim ? 0.3 : 1 }}` which takes precedence over whileInView after first viewport entry) OR remove the conflicting className and use motion's animate."
+}

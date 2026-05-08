@@ -1,8 +1,18 @@
-import { useEffect, useState } from "react";
-import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useSpring, useMotionValue, AnimatePresence } from "framer-motion";
 import Lenis from "lenis";
 import axios from "axios";
-import { ArrowUpRight, Plus, Minus, ArrowRight, Sparkles, Bot, Workflow, Globe2 } from "lucide-react";
+import {
+  ArrowUpRight,
+  Plus,
+  Minus,
+  ArrowRight,
+  Code2,
+  Layers,
+  Film,
+  Sparkles,
+  PenLine,
+} from "lucide-react";
 import Cursor, { Magnetic } from "@/components/Cursor";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -17,31 +27,48 @@ const NAV = [
 const SERVICES = [
   {
     n: "01",
-    title: "AI Automation",
-    icon: Workflow,
-    blurb: "Bespoke automations that connect your stack and reclaim hundreds of hours every quarter.",
-    img: "https://images.unsplash.com/photo-1773236376238-bde8e75c7506?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200",
+    title: "Website Creation",
+    icon: Layers,
+    tag: "Design + Build",
+    blurb:
+      "Landing pages, portfolios, full sites with payments and bookings — fast, clear, and built to convert.",
+    img: "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
   },
   {
     n: "02",
-    title: "Custom Chatbots",
-    icon: Bot,
-    blurb: "AI assistants trained on your business — deployed to your site, WhatsApp, and support stack.",
-    img: "https://images.unsplash.com/photo-1680992046626-418f7e910589?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200",
+    title: "SaaS Development",
+    icon: Code2,
+    tag: "Web Apps + APIs",
+    blurb:
+      "Full SaaS platforms with login, database, payments, and dashboards. Real product, ready for real users.",
+    img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
   },
   {
     n: "03",
-    title: "Content Engines",
-    icon: Sparkles,
-    blurb: "Production engines for short-form, long-form and branded social — running 24/7.",
-    img: "https://images.unsplash.com/photo-1765046255479-669cf07a0230?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200",
+    title: "Short-Form Content",
+    icon: Film,
+    tag: "Reels · TikToks · Shorts",
+    blurb:
+      "Daily Reels, TikToks and Shorts for your brand — fully edited, captioned, and ready to post.",
+    img: "https://images.unsplash.com/photo-1626218174358-7769486f0e91?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
   },
   {
     n: "04",
-    title: "Websites",
-    icon: Globe2,
-    blurb: "Conversion-focused, motion-rich websites engineered to turn visitors into pipeline.",
-    img: "https://images.unsplash.com/photo-1689028294160-e78a88abcb19?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200",
+    title: "AI Video Ads",
+    icon: Sparkles,
+    tag: "Generated + Edited",
+    blurb:
+      "Ready-to-run ad videos with AI actors, scripts and editing — no filming, no studio, no excuses.",
+    img: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
+  },
+  {
+    n: "05",
+    title: "Copywriting",
+    icon: PenLine,
+    tag: "Words That Sell",
+    blurb:
+      "We write the words for your site, ads, and product so people understand what you offer and act on it.",
+    img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
   },
 ];
 
@@ -194,59 +221,167 @@ function Marquee() {
 }
 
 function Services() {
+  const [active, setActive] = useState(null);
+  const containerRef = useRef(null);
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, { stiffness: 220, damping: 26, mass: 0.5 });
+  const sy = useSpring(my, { stiffness: 220, damping: 26, mass: 0.5 });
+
+  const onMove = (e) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    mx.set(e.clientX - rect.left);
+    my.set(e.clientY - rect.top);
+  };
+
   return (
     <section id="services" className="relative py-28 md:py-40 px-6 md:px-12 max-w-7xl mx-auto">
-      <div className="flex items-end justify-between gap-8 flex-wrap mb-16">
+      <div className="flex items-end justify-between gap-8 flex-wrap mb-12 md:mb-16">
         <div>
           <div className="font-mono-tech text-[10px] uppercase tracking-[0.32em] text-white/40 mb-5">
-            / Services
+            / Services — 05
           </div>
           <h2 className="font-display font-black text-4xl md:text-6xl tracking-tighter leading-[0.95] max-w-2xl text-balance">
-            Four disciplines. <span className="text-white/40">One operating system.</span>
+            Five disciplines. <span className="text-white/40">Built for launch.</span>
           </h2>
         </div>
         <p className="max-w-sm text-white/60 leading-relaxed">
-          We design, build, and operate the AI infrastructure that quietly does the work behind your business.
+          Everything you need to launch, grow, and automate — from the website to the words to the
+          videos that sell it.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Hover-reveal index */}
+      <div
+        ref={containerRef}
+        onMouseMove={onMove}
+        onMouseLeave={() => setActive(null)}
+        className="relative border-t border-white/[0.08]"
+        data-testid="services-index"
+      >
         {SERVICES.map((s, i) => {
           const Icon = s.icon;
+          const isActive = active === i;
+          const dim = active !== null && !isActive;
           return (
-            <motion.article
+            <motion.button
               key={s.n}
-              initial={{ opacity: 0, y: 30 }}
+              type="button"
+              onMouseEnter={() => setActive(i)}
+              onFocus={() => setActive(i)}
+              onClick={() => {
+                document
+                  .getElementById("contact")
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.7, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -4 }}
-              className="group relative glass rounded-3xl p-3 overflow-hidden"
-              data-testid={`service-card-${s.n}`}
-              data-cursor="hover"
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.6, delay: i * 0.06 }}
+              data-testid={`service-row-${s.n}`}
+              data-cursor="view"
+              data-cursor-label="Discover"
+              className={`relative w-full text-left flex items-center justify-between gap-6 py-6 md:py-8 border-b border-white/[0.08] transition-all duration-500 ${
+                dim ? "opacity-30" : "opacity-100"
+              }`}
             >
-              <div className="card-img-frame relative aspect-[16/10] rounded-2xl overflow-hidden">
-                <img
-                  src={s.img}
-                  alt={s.title}
-                  loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover grayscale opacity-40 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute top-4 left-4 flex items-center gap-2 font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/60">
-                  <span>/ {s.n}</span>
-                </div>
-                <div className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 backdrop-blur-md grid place-items-center group-hover:bg-white group-hover:text-black transition-colors">
-                  <Icon className="w-4 h-4" strokeWidth={1.6} />
-                </div>
+              {/* Number */}
+              <span
+                className={`font-mono-tech text-[11px] md:text-xs uppercase tracking-[0.22em] w-12 md:w-16 shrink-0 transition-colors ${
+                  isActive ? "text-white" : "text-white/35"
+                }`}
+              >
+                {s.n}
+              </span>
+
+              {/* Title block */}
+              <div className="flex-1 min-w-0">
+                <motion.h3
+                  animate={{ x: isActive ? 12 : 0, letterSpacing: isActive ? "-0.04em" : "-0.045em" }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="font-display font-black text-3xl md:text-5xl lg:text-6xl tracking-tighter leading-[1] truncate"
+                >
+                  {s.title}
+                </motion.h3>
+                <AnimatePresence>
+                  {isActive && (
+                    <motion.p
+                      initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                      animate={{ opacity: 1, height: "auto", marginTop: 14 }}
+                      exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                      className="text-white/55 text-sm md:text-base max-w-xl leading-relaxed overflow-hidden"
+                    >
+                      {s.blurb}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </div>
-              <div className="p-5 pt-6">
-                <h3 className="font-display font-bold text-2xl tracking-tight mb-2.5">{s.title}</h3>
-                <p className="text-white/55 leading-relaxed text-[15px]">{s.blurb}</p>
-              </div>
-            </motion.article>
+
+              {/* Tag */}
+              <span className="hidden lg:inline-block font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/40 mr-4 whitespace-nowrap">
+                {s.tag}
+              </span>
+
+              {/* Icon */}
+              <span
+                className={`shrink-0 w-12 h-12 rounded-full grid place-items-center transition-all duration-500 ${
+                  isActive ? "bg-white text-black scale-110" : "bg-white/[0.04] text-white/60 border border-white/10"
+                }`}
+              >
+                <Icon className="w-4 h-4" strokeWidth={1.7} />
+              </span>
+            </motion.button>
           );
         })}
+
+        {/* Floating cursor-following preview image */}
+        <motion.div
+          aria-hidden
+          style={{ x: sx, y: sy, translateX: "-50%", translateY: "-50%" }}
+          className="pointer-events-none absolute top-0 left-0 w-72 md:w-96 aspect-[4/5] rounded-2xl overflow-hidden hidden md:block z-20"
+          animate={{ opacity: active !== null ? 1 : 0, scale: active !== null ? 1 : 0.92 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {SERVICES.map((s, i) => (
+            <motion.img
+              key={s.n}
+              src={s.img}
+              alt=""
+              loading="lazy"
+              animate={{ opacity: active === i ? 1 : 0 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/90">
+            <span>/ {active !== null ? SERVICES[active].n : "00"}</span>
+            <span className="inline-flex items-center gap-1">
+              {active !== null ? SERVICES[active].tag : ""}
+              <ArrowUpRight className="w-3 h-3" />
+            </span>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* CTA below */}
+      <div className="mt-14 flex items-center justify-between gap-6 flex-wrap">
+        <p className="font-mono-tech text-[11px] uppercase tracking-[0.22em] text-white/40">
+          / Hover any row — drag-style cursor reveals the canvas.
+        </p>
+        <Magnetic strength={0.18}>
+          <a
+            href="#contact"
+            data-cursor="hover"
+            data-testid="services-cta"
+            className="inline-flex items-center gap-2 border border-white/15 hover:border-white/40 text-sm font-medium px-5 py-3 rounded-full transition-colors"
+          >
+            Brief us on yours
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </Magnetic>
       </div>
     </section>
   );
