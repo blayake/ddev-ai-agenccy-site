@@ -275,16 +275,13 @@ function Services() {
                   .getElementById("contact")
                   ?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.6, delay: i * 0.06 }}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: dim ? 0.25 : 1, y: 0 }}
+              transition={{ duration: 0.55, delay: active === null ? i * 0.06 : 0, ease: [0.22, 1, 0.36, 1] }}
               data-testid={`service-row-${s.n}`}
               data-cursor="view"
               data-cursor-label="Discover"
-              className={`relative w-full text-left flex items-center justify-between gap-6 py-6 md:py-8 border-b border-white/[0.08] transition-all duration-500 ${
-                dim ? "opacity-30" : "opacity-100"
-              }`}
+              className="relative w-full text-left flex items-center justify-between gap-6 py-6 md:py-8 border-b border-white/[0.08]"
             >
               {/* Number */}
               <span
