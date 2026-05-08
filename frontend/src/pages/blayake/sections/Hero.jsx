@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Magnetic } from "@/components/Cursor";
+import { LogoMark } from "@/components/Logo";
 import { HERO_IMG } from "@/pages/blayake/data";
 
 function HeroBadge() {
@@ -88,6 +89,10 @@ function HeroVisual({ y, scale }) {
       <div className="absolute top-5 left-5 right-5 flex justify-between items-center">
         <span className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/80">/ STUDIO_001</span>
         <span className="glass rounded-full px-2.5 py-1 font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/80">REC ●</span>
+      </div>
+      {/* Logo watermark inside the card */}
+      <div className="absolute inset-0 grid place-items-center pointer-events-none">
+        <LogoMark size={84} bg="rgba(255,255,255,0.92)" fg="#0a0a0a" className="opacity-90 drop-shadow-[0_8px_30px_rgba(0,0,0,0.45)]" />
       </div>
       <div className="absolute bottom-5 left-5 right-5 flex justify-between items-end">
         <div>

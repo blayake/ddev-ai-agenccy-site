@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { LogoLockup } from "@/components/Logo";
 import { NAV } from "@/pages/blayake/data";
 
 export default function Header() {
@@ -15,12 +16,9 @@ export default function Header() {
         href="#top"
         data-testid="brand-logo"
         data-cursor="hover"
-        className="flex items-center gap-2 pl-3 pr-4 py-2 rounded-full hover:bg-white/[0.04] transition-colors"
+        className="flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full hover:bg-white/[0.04] transition-colors"
       >
-        <div className="w-6 h-6 rounded-full bg-white grid place-items-center">
-          <span className="text-black font-display font-black text-[10px] leading-none">B</span>
-        </div>
-        <span className="font-display font-bold text-sm tracking-tight">Blayake</span>
+        <LogoLockup markSize={28} textSize={15} textColor="#fff" />
       </a>
       {NAV.map((n) => (
         <a

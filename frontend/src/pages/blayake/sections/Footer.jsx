@@ -1,3 +1,5 @@
+import { LogoMark, Wordmark } from "@/components/Logo";
+
 const SOCIALS = [
   { id: "x", label: "@blayake on X", href: "https://x.com/blayake", external: true, testid: "footer-x" },
   { id: "linkedin", label: "LinkedIn", href: "#", external: false, testid: "footer-linkedin" },
@@ -16,8 +18,11 @@ export default function Footer() {
     <footer className="relative pt-16 pb-6 px-6 md:px-12 border-t border-white/[0.06] overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-10 md:gap-0 md:items-end justify-between pb-12">
         <div>
-          <div className="font-display font-bold text-xl">Blayake</div>
-          <p className="mt-3 text-white/50 text-sm max-w-xs leading-relaxed">
+          <div className="flex items-center gap-3">
+            <LogoMark size={34} />
+            <Wordmark size={20} />
+          </div>
+          <p className="mt-4 text-white/50 text-sm max-w-xs leading-relaxed">
             A senior team building bespoke AI systems for operators who refuse to be ignored.
           </p>
         </div>
