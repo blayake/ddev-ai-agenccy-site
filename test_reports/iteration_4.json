@@ -1,0 +1,39 @@
+{
+  "summary": "Frontend-only regression + iteration-4 visual/parallax additions verified on Blayake landing page at desktop 1920x1080. All new features work: hero parallax visual card, image-marquee, StudioReel section with horizontal BUILT IN PUBLIC parallax + bg image parallax, Work section with 4 rows including HALCYON LABS and proper hover dim. Iteration-3 Services dim bug is FIXED (animate now drives opacity through Framer Motion). 0 console errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/test_reports/iteration_4.json"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Blayake.jsx is now ~894 lines — approaching the 700-line guideline ceiling. Recommend splitting into per-section components (Hero, Marquee, StudioReel, Services, Work, Faq, Contact, Footer) under /app/frontend/src/pages/blayake/ for maintainability.",
+    "Marquee `keys` use array index `i` for duplicated stream entries — fine for a static list but if items become dynamic this will cause unstable keys. Consider `${item}-${i}` if items become reorderable.",
+    "Lenis smooth-scroll is initialised but framer-motion's useScroll defaults to window scroll — works because Lenis writes to native scroll, but worth documenting. No bug.",
+    "REEL_IMG and HERO_IMG are eager/lazy mixed; HERO_IMG uses loading=\"eager\" which is correct for above-the-fold. Marquee + Reel images are lazy — verified images loaded after scroll-into-view."
+  ],
+  "verified_checks": {
+    "hero_visual": "visible=true, image present, STUDIO_001/REC/v3·Autonomous Ops labels all rendered",
+    "image_marquee": "21 images rendered in track; 6 labels (AUTOMATION, DESIGN, BUILD, CONTENT, DEPLOY, RESULTS) each appearing 3x in 3-stream loop",
+    "studio_reel": "reel-cta href=#work; STUDIO_REEL — 2026 corner label visible; BUILT IN PUBLIC text rendered",
+    "work_rows": "4 rows (work-row-0..3), HALCYON LABS / HEALTH visible at row-3",
+    "work_hover_dim": "hovering work-row-1: r0=0.3, r1=1, r2=0.3, r3=0.3 (computed opacity) — dim effect works",
+    "service_hover_dim": "hovering service-row-02: opacities=[0.25, 1, 0.25, 0.25, 0.25] — iteration-3 dim bug FIXED",
+    "cursor_label": "cursor-ring innerText='DISCOVER' on service hover; cursor-dot + cursor-ring mount on desktop",
+    "hero_parallax_y": "image inline transform changes from translateY(0)/none at scroll=0 to translateY(83.33px) scale(1.056) at scroll=500 — vertical parallax works",
+    "reel_bg_parallax_y": "bg image translateY: -11.11% (before) -> -1.39% (top) -> 7.5% (mid) -> 13.61% (end) — works",
+    "reel_title_parallax_x": "BUILT IN PUBLIC. translateX: 5.46% (before) -> -5.88% (top) -> -16.25% (mid) -> -23.38% (end) — horizontal parallax works",
+    "contact": "contact-email pill, contact-x pill, form-phone input all present",
+    "console_errors": 0
+  },
+  "updated_files": [],
+  "success_rate": {"backend": "skipped (not requested)", "frontend": "100%"},
+  "test_credentials": "n/a",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 4 fully verified on desktop 1920x1080. Lenis smooth-scroll requires waiting ~1500ms after window.scrollTo({behavior:'instant'}) for framer-motion useScroll/useTransform values to settle. To sample motion-driven transforms, query the deepest element with matching textContent (use direct text-node filter) — querying by textContent.trim() picks ancestors first. hero-visual is hidden below lg breakpoint (lg:block class). Backend not retested — last green at iteration_2/test_blayake_api.py.",
+  "rca_of_the_issue": "n/a — no bugs found this iteration. Iteration-3 dim-effect bug RCA confirmed fixed: code now uses `animate={{ opacity: dim ? 0.25 : 1, y: 0 }}` on the motion.button (single source of truth via Framer Motion), and the conflicting Tailwind opacity-30/opacity-100 className was removed. Verified via getComputedStyle: non-active service rows show opacity=0.25, active=1; non-active work rows show opacity=0.3, active=1."
+}
