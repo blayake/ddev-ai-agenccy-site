@@ -1,43 +1,55 @@
 # BLAYAKE — AI Systems Agency · PRD
 
 ## Original Problem Statement
-User shared a Framer Motion-heavy `BlayakeAgency` React component (dark theme, blue/purple ambient glows, glassmorphism, custom cursor, services grid, marquee) and asked for "something like this and more optimized." User chose: frontend + backend with lead-capture form, "BLAYAKE" branding kept, fresh distinctive design (not the same generic dark+blue/purple+glass aesthetic), all sections (Hero, Services, Stats, Process, Case Studies, Testimonials, FAQ, Contact, Footer), both performance + visual-polish optimizations.
+User shared a Framer Motion-heavy `BlayakeAgency` reference component and asked for "something like this and more optimized." Iterated to: small, animation-rich landing page styled after **zaid.agency** (monochrome, floating pill nav, glassmorphic image-top cards, white pill CTAs) plus **custom cursor animations**.
 
 ## Architecture
-- **Frontend**: React 19 (CRA + craco) + Tailwind + Framer Motion + Lenis smooth scroll + Axios. Single-page app at `/app/frontend/src/pages/Blayake.jsx` mounted at `/`.
-- **Backend**: FastAPI + Motor (async MongoDB). All routes under `/api`. Lead capture stored in `leads` collection with UUID id and ISO datetime.
-- **Theme**: Obsidian (#0F0F0F) + Bone (#F2EFE9) + Electric Tangerine (#FF5722). Cabinet Grotesk (display) + JetBrains Mono (technical/labels) + Manrope (body). Hairline grid + grain texture + ember glows for editorial depth.
+- **Frontend**: React 19 + Tailwind + Framer Motion + Lenis smooth scroll + Axios
+  - `/app/frontend/src/pages/Blayake.jsx` — single-page composite (~480 lines, 6 subcomponents)
+  - `/app/frontend/src/components/Cursor.jsx` — custom cursor with `<Cursor />` (dot + ring, hover/view variants, mix-blend-difference, auto-disabled on touch) and `<Magnetic />` wrapper (springs CTA toward pointer)
+- **Backend**: FastAPI + Motor (async MongoDB), routes under `/api`
+  - `POST /api/leads` (LeadCreate: name, email, phone?, company?, project_type?, message?)
+  - `GET /api/leads` (sorted desc, no `_id`)
+- **Theme**: Pure monochrome — `#050505` background + white text, dotted grid backdrop, soft halos, grain. Cabinet Grotesk + JetBrains Mono + Manrope (no Inter/Roboto).
 
 ## User Personas
-- Senior operators / founders evaluating an AI engineering partner
+- Founders/operators evaluating an AI engineering partner
 - Marketing/ops leads researching automation vendors
-- Recruiters / press skimming case studies
+- Recruiters / press scanning the studio's case work
 
-## Core Requirements (static)
-1. Single-page marketing site, distinctive editorial dark aesthetic
-2. Lead capture form persisted to MongoDB via `POST /api/leads`
-3. Visible sections: Hero, Marquee, Services (4-card bento), Stats, Process, Case Studies, Testimonials, FAQ accordion, Contact form, Footer
-4. Smooth scroll, scroll progress, motion-rich micro-interactions
-5. All interactive elements carry `data-testid`
+## Core Requirements
+1. Small, animation-rich, distinctive monochrome marketing site
+2. MongoDB-backed lead capture form (Name + Email + Phone + Message)
+3. Sections: Hero · Marquee · Services (4 image-top glass cards) · Selected Work (3 editorial rows) · FAQ (3 items) · Contact · Footer
+4. Custom cursor on desktop with hover scale + "View" label expansion + magnetic CTAs
+5. Lenis smooth scroll, scroll-progress bar, all interactive elements have `data-testid`
 
 ## What's Been Implemented (2026-05-08)
-- ✅ Backend: FastAPI app with health (`GET /api/`), `POST /api/leads` (Pydantic `EmailStr` validation, returns 201), `GET /api/leads` (sorted desc, no `_id`), legacy `/api/status` retained.
-- ✅ Frontend: full Blayake page — Header, Hero with reveal-mask animation, Marquee, Services bento grid, Stats, Process grid, Case Studies (grayscale → color hover), Testimonials, FAQ accordion (1st open by default), Contact form wired to `POST /api/leads`, large-wordmark Footer, Lenis smooth scroll, scroll progress bar.
-- ✅ Tailwind config with custom palette, fonts (Cabinet Grotesk via Fontshare, JetBrains Mono, Manrope) loaded in `index.html`.
-- ✅ Tested: 100% backend (pytest @ `/app/backend/tests/test_blayake_api.py`), 100% frontend (testing agent E2E iteration_1).
+- ✅ V1: Editorial dark + tangerine layout (Hero, 4-card bento, Stats, Process, 3 Case Studies, Testimonials, FAQ, Contact, Footer) — tested 100%
+- ✅ V2 (current): zaid-inspired monochrome redesign + custom cursor:
+  - Floating pill nav (centered, sticky)
+  - Hero with reveal-line mask animation, halo glow, magnetic CTAs
+  - Glassmorphic 2×2 services grid with image-on-top + icon badges
+  - Editorial work rows with "VIEW" cursor-label expansion on hover
+  - FAQ accordion (animated with AnimatePresence)
+  - Centered contact card with Name/Email/Phone/Message + magnetic submit
+  - Massive BLAYAKE wordmark footer
+  - **Cursor**: dot + spring-trailed ring with `data-cursor="hover|view|hide"` API; magnetic CTA wrapper
+  - Backend Lead model now allows optional phone & message
+- ✅ Tested twice — iteration_1 100%, iteration_2 100% (backend pytest 7/7, frontend playwright e2e including cursor scale verification)
 
 ## Prioritized Backlog
+- **P1**: Connect lead form to email (Resend/SendGrid) for real-time team notifications + auto-reply with calendar link (Cal.com)
 - **P1**: Add per-case-study detail pages (`/work/[slug]`) when real client work exists
-- **P1**: Connect lead form to email (Resend / SendGrid) so leads notify the team in real time
-- **P2**: Add admin dashboard at `/admin` to view leads (auth required)
-- **P2**: Lighthouse pass — preconnect hints already present, add `loading="lazy"` audit + image dimensions
-- **P3**: Refactor `Blayake.jsx` (~770 lines) into per-section components
-- **P3**: Replace `@app.on_event("shutdown")` with FastAPI lifespan context manager
-- **P3**: Decide invalid-email surfacing in `form-status` (currently HTML5 blocks before axios)
+- **P2**: Admin `/admin` lead inbox (auth required)
+- **P2**: Lighthouse pass — preconnect already set, audit image dimensions + LCP
+- **P3**: Split `Blayake.jsx` into `pages/Blayake/sections/*` if it grows >700 lines
+- **P3**: Replace deprecated `@app.on_event("shutdown")` with FastAPI lifespan context
 
 ## Next Tasks
-- Add a lead-notification integration (Resend or SendGrid) so submissions hit the team's inbox
-- Optional: split `Blayake.jsx` into composable section files
+- Wire lead notification (Resend) so submissions ping the inbox immediately
+- Optional: drop unused `company` / `project_type` from `LeadCreate` if no longer needed
 
 ## Notes
-- No auth, no LLM, no third-party APIs in this MVP. Pure React/Tailwind frontend + FastAPI/Mongo backend.
+- No auth, no LLM, no third-party APIs in MVP. Pure React + FastAPI + Mongo.
+- Cursor auto-hides on coarse pointers (touch); native cursor restored automatically.
