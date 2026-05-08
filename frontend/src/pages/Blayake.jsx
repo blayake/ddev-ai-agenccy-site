@@ -391,6 +391,26 @@ function Contact() {
         <p className="mt-6 text-white/60 max-w-md mx-auto leading-relaxed">
           Drop your details below and we'll get back to you within 24 hours.
         </p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 font-mono-tech text-[11px] uppercase tracking-[0.22em]">
+          <a
+            href="mailto:teamblayake.agency@gmail.com"
+            data-cursor="hover"
+            data-testid="contact-email"
+            className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-white/80 hover:text-white hover:border-white/25 transition"
+          >
+            teamblayake.agency@gmail.com
+          </a>
+          <a
+            href="https://x.com/blayake"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-cursor="hover"
+            data-testid="contact-x"
+            className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-white/80 hover:text-white hover:border-white/25 transition"
+          >
+            @blayake on X
+          </a>
+        </div>
       </div>
 
       <form onSubmit={submit} className="mt-14 glass rounded-3xl p-6 md:p-8 space-y-4" data-testid="contact-form">
@@ -442,10 +462,10 @@ function Footer() {
           </p>
         </div>
         <div className="flex flex-wrap gap-x-10 gap-y-4 font-mono-tech text-[11px] uppercase tracking-[0.22em] text-white/50">
-          <a href="#" className="link-underline" data-cursor="hover">Twitter / X</a>
-          <a href="#" className="link-underline" data-cursor="hover">LinkedIn</a>
-          <a href="#" className="link-underline" data-cursor="hover">Instagram</a>
-          <a href="mailto:hello@blayake.agency" className="link-underline" data-cursor="hover">hello@blayake.agency</a>
+          <a href="https://x.com/blayake" target="_blank" rel="noopener noreferrer" className="link-underline" data-cursor="hover" data-testid="footer-x">@blayake on X</a>
+          <a href="#" className="link-underline" data-cursor="hover" data-testid="footer-linkedin">LinkedIn</a>
+          <a href="#" className="link-underline" data-cursor="hover" data-testid="footer-instagram">Instagram</a>
+          <a href="mailto:teamblayake.agency@gmail.com" className="link-underline" data-cursor="hover" data-testid="footer-email">teamblayake.agency@gmail.com</a>
         </div>
       </div>
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-6 pt-6 border-t border-white/[0.06]">
