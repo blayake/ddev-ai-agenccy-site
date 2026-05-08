@@ -1,314 +1,191 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, useScroll, useSpring, useTransform, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import Lenis from "lenis";
 import axios from "axios";
-import { ArrowUpRight, Plus, Minus, Sparkles, Bot, Workflow, Globe2, Zap, ArrowRight } from "lucide-react";
+import { ArrowUpRight, Plus, Minus, ArrowRight, Sparkles, Bot, Workflow, Globe2 } from "lucide-react";
+import Cursor, { Magnetic } from "@/components/Cursor";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 /* ---------------- Data ---------------- */
 const NAV = [
   { label: "Work", href: "#work" },
   { label: "Services", href: "#services" },
-  { label: "Process", href: "#process" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Contact", href: "#contact" },
 ];
 
 const SERVICES = [
   {
-    id: "01",
+    n: "01",
     title: "AI Automation",
     icon: Workflow,
-    span: "md:col-span-8",
-    blurb:
-      "Bespoke automations that connect your tools, eliminate repetitive ops, and reclaim hundreds of hours every quarter.",
-    tags: ["n8n", "Make", "Zapier", "Custom Python"],
+    blurb: "Bespoke automations that connect your stack and reclaim hundreds of hours every quarter.",
+    img: "https://images.unsplash.com/photo-1773236376238-bde8e75c7506?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200",
   },
   {
-    id: "02",
-    title: "AI Content Systems",
-    icon: Sparkles,
-    span: "md:col-span-4",
-    blurb: "Production engines for short-form, long-form and branded social — running 24/7.",
-    tags: ["GPT", "Claude", "Veo"],
-  },
-  {
-    id: "03",
-    title: "Custom AI Chatbots",
+    n: "02",
+    title: "Custom Chatbots",
     icon: Bot,
-    span: "md:col-span-4",
-    blurb: "Trained on your business. Deployed to your site, WhatsApp & support stack.",
-    tags: ["RAG", "Tools", "Voice"],
+    blurb: "AI assistants trained on your business — deployed to your site, WhatsApp, and support stack.",
+    img: "https://images.unsplash.com/photo-1680992046626-418f7e910589?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200",
   },
   {
-    id: "04",
-    title: "Website Development",
+    n: "03",
+    title: "Content Engines",
+    icon: Sparkles,
+    blurb: "Production engines for short-form, long-form and branded social — running 24/7.",
+    img: "https://images.unsplash.com/photo-1765046255479-669cf07a0230?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200",
+  },
+  {
+    n: "04",
+    title: "Websites",
     icon: Globe2,
-    span: "md:col-span-8",
-    blurb:
-      "Conversion-focused, performant, motion-rich websites engineered to turn visitors into pipeline.",
-    tags: ["Next.js", "React", "Framer Motion", "Webflow"],
+    blurb: "Conversion-focused, motion-rich websites engineered to turn visitors into pipeline.",
+    img: "https://images.unsplash.com/photo-1689028294160-e78a88abcb19?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200",
   },
 ];
 
-const STATS = [
-  { value: "150+", label: "Projects Shipped" },
-  { value: "98%", label: "Client Satisfaction" },
-  { value: "24/7", label: "Always-on Systems" },
-  { value: "10×", label: "Avg. Throughput" },
-];
-
-const PROCESS = [
-  { n: "01", t: "Discover", d: "Strategy sprint to map ops, gaps, and the highest-leverage AI bets." },
-  { n: "02", t: "Design", d: "Wire systems & interfaces. Define data, models, and human handoffs." },
-  { n: "03", t: "Build", d: "Ship in 2-week cycles. Production code, observable, version-controlled." },
-  { n: "04", t: "Deploy", d: "Go-live, monitor, iterate. We stay on as your AI engineering partner." },
-];
-
-const CASES = [
-  {
-    client: "OAKBRIDGE / FINTECH",
-    title: "Reduced underwriting cycle by 71%",
-    img: "https://images.unsplash.com/photo-1773236376238-bde8e75c7506?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
-    metric: "71%",
-    metricLabel: "faster decisions",
-  },
-  {
-    client: "NORTHWIND / SAAS",
-    title: "AI support deflected 62% of tickets",
-    img: "https://images.unsplash.com/photo-1680992046626-418f7e910589?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
-    metric: "62%",
-    metricLabel: "ticket deflection",
-  },
-  {
-    client: "STUDIO MERIDIAN / DTC",
-    title: "Doubled organic content output, halved cost",
-    img: "https://images.unsplash.com/photo-1765046255479-669cf07a0230?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
-    metric: "2.1×",
-    metricLabel: "content velocity",
-  },
-];
-
-const TESTIMONIALS = [
-  {
-    quote:
-      "Blayake didn't sell us AI — they engineered a quiet machine that runs our ops while we sleep. Cleanest team we've worked with.",
-    name: "Marcus Halden",
-    role: "COO, Oakbridge Capital",
-    avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=srgb&fm=jpg&q=85&w=400",
-  },
-  {
-    quote:
-      "Six weeks in, our content engine had outproduced our previous year. Strategy + craft + speed in one team.",
-    name: "Iris Tanaka",
-    role: "Head of Brand, Studio Meridian",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?crop=entropy&cs=srgb&fm=jpg&q=85&w=400",
-  },
-  {
-    quote:
-      "They treated our LLM stack like real software — observability, evals, on-call. Night and day vs. our last vendor.",
-    name: "Priya Achar",
-    role: "VP Engineering, Northwind",
-    avatar: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?crop=entropy&cs=srgb&fm=jpg&q=85&w=400",
-  },
+const WORK = [
+  { client: "OAKBRIDGE / FINTECH", title: "Underwriting cycle, –71%", year: "2026" },
+  { client: "NORTHWIND / SAAS", title: "AI support deflected 62% of tickets", year: "2025" },
+  { client: "STUDIO MERIDIAN / DTC", title: "Doubled organic content, halved cost", year: "2025" },
 ];
 
 const FAQ = [
-  { q: "How long does a typical engagement run?", a: "Most projects ship a first production system in 4–6 weeks. We then move to retainer or staff-aug for ongoing iteration." },
-  { q: "Do you work with non-technical founders?", a: "Yes. Half of our clients have no in-house engineering. We bring strategy, build, and a maintenance plan you can actually own." },
-  { q: "Which models and stacks do you use?", a: "We're stack-agnostic — OpenAI, Anthropic, Gemini, open-source Llama variants, plus the orchestration layer that fits your data and budget." },
-  { q: "Will my data leave our infrastructure?", a: "Only if you want it to. We design private deployments, on-prem options, and zero-retention API configurations by default." },
-  { q: "What does pricing look like?", a: "Fixed-price builds typically range $12k–$60k. Retainers start at $6k/mo. We send a clear scope before any commitment." },
+  { q: "How fast can you ship?", a: "Most projects ship a first production system in 4–6 weeks. Then we move to retainer or staff-aug." },
+  { q: "Which models do you use?", a: "Stack-agnostic — OpenAI, Anthropic, Gemini, open-source Llama variants, plus the orchestration that fits your data." },
+  { q: "What does pricing look like?", a: "Fixed-price builds typically range $12k–$60k. Retainers start at $6k/mo. Clear scope before any commitment." },
 ];
 
-/* ---------------- Helpers ---------------- */
-function useReveal() {
-  return {
-    initial: { opacity: 0, y: 24 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true, margin: "-80px" },
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-  };
-}
-
-/* ---------------- Components ---------------- */
+/* ---------------- UI ---------------- */
 function Header() {
-  const [open, setOpen] = useState(false);
   return (
-    <header
+    <motion.header
       data-testid="site-header"
-      className="sticky top-0 z-50 backdrop-blur-xl bg-ink-900/70 border-b border-ink-600"
+      initial={{ y: -40, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 0.2, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed top-5 left-1/2 -translate-x-1/2 z-50 pill-nav rounded-full px-2 py-2 flex items-center gap-1"
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
-        <a href="#top" className="flex items-center gap-3" data-testid="brand-logo">
-          <div className="w-9 h-9 bg-tangerine flex items-center justify-center rounded-sm">
-            <span className="text-ink-900 font-display font-black text-lg leading-none">B</span>
-          </div>
-          <div className="leading-tight">
-            <div className="font-display font-bold tracking-tight text-base">BLAYAKE</div>
-            <div className="font-mono-tech text-[9px] tracking-[0.32em] text-ink-300 uppercase">
-              AI Systems / Est. 2024
-            </div>
-          </div>
-        </a>
-        <nav className="hidden md:flex items-center gap-10 font-mono-tech text-[11px] uppercase tracking-[0.22em] text-ink-300">
-          {NAV.map((n) => (
-            <a key={n.href} href={n.href} className="link-underline hover:text-ink-100 transition-colors" data-testid={`nav-${n.label.toLowerCase()}`}>
-              {n.label}
-            </a>
-          ))}
-        </nav>
+      <a
+        href="#top"
+        data-testid="brand-logo"
+        data-cursor="hover"
+        className="flex items-center gap-2 pl-3 pr-4 py-2 rounded-full hover:bg-white/[0.04] transition-colors"
+      >
+        <div className="w-6 h-6 rounded-full bg-white grid place-items-center">
+          <span className="text-black font-display font-black text-[10px] leading-none">B</span>
+        </div>
+        <span className="font-display font-bold text-sm tracking-tight">Blayake</span>
+      </a>
+      {NAV.map((n) => (
         <a
-          href="#contact"
-          data-testid="header-cta-book"
-          className="group inline-flex items-center gap-2 bg-tangerine hover:bg-tangerine-hover text-ink-900 font-mono-tech text-[11px] font-bold uppercase tracking-[0.22em] px-5 py-3 rounded-sm transition-all hover:-translate-y-0.5"
+          key={n.href}
+          href={n.href}
+          data-cursor="hover"
+          data-testid={`nav-${n.label.toLowerCase()}`}
+          className="px-4 py-2 rounded-full text-sm text-white/70 hover:text-white hover:bg-white/[0.04] transition-colors"
         >
-          Book a Call
-          <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          {n.label}
         </a>
-      </div>
-    </header>
+      ))}
+      <a
+        href="#contact"
+        data-testid="header-cta-book"
+        data-cursor="hover"
+        className="ml-1 inline-flex items-center gap-1.5 bg-white text-black text-sm font-semibold px-4 py-2 rounded-full hover:bg-white/90 transition"
+      >
+        Book a Call
+        <ArrowUpRight className="w-3.5 h-3.5" />
+      </a>
+    </motion.header>
   );
 }
 
 function Hero() {
   return (
-    <section id="top" className="relative pt-24 md:pt-32 pb-24 md:pb-32 px-6 md:px-12 max-w-7xl mx-auto">
-      <div className="absolute -top-32 -left-32 w-[520px] h-[520px] ember pointer-events-none" />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end">
-        <div className="lg:col-span-7">
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 border border-ink-500 rounded-sm px-3 py-1.5 mb-10 font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300"
-            data-testid="availability-badge"
-          >
-            <span className="relative inline-flex w-1.5 h-1.5">
-              <span className="absolute inset-0 rounded-full bg-tangerine animate-ping opacity-60" />
-              <span className="relative inline-block w-1.5 h-1.5 rounded-full bg-tangerine" />
-            </span>
-            Booking Q1 / 2026 — 2 slots open
-          </motion.div>
+    <section id="top" className="relative min-h-screen flex items-center px-6 md:px-12 pt-32 pb-20 max-w-7xl mx-auto">
+      <div className="absolute top-1/4 right-0 w-[640px] h-[640px] halo pointer-events-none -z-0" />
 
-          <h1 className="font-display font-black text-[14vw] md:text-[9vw] lg:text-[7.4vw] leading-[0.88] tracking-[-0.04em]">
-            <span className="reveal-line"><span style={{ animationDelay: "0.05s" }}>We engineer</span></span>
-            <br />
-            <span className="reveal-line"><span style={{ animationDelay: "0.18s" }}>autonomous</span></span>{" "}
-            <span className="reveal-line"><span style={{ animationDelay: "0.28s" }} className="text-tangerine italic font-medium">growth.</span></span>
-          </h1>
+      <div className="relative w-full">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="inline-flex items-center gap-2 glass rounded-full px-3.5 py-1.5 mb-10 font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/70"
+          data-testid="availability-badge"
+        >
+          <span className="relative inline-flex w-1.5 h-1.5">
+            <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-60" />
+            <span className="relative inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          </span>
+          Booking Q1 / 2026 — 2 slots
+        </motion.div>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-            className="mt-10 max-w-xl text-ink-300 text-base md:text-lg leading-relaxed"
-          >
-            Blayake is a small, senior team of engineers and designers building bespoke AI systems
-            for ambitious operators — automations, content engines, custom chatbots, and the
-            websites that put them to work.
-          </motion.p>
+        <h1 className="font-display font-black tracking-[-0.04em] leading-[0.92] text-[14vw] md:text-[10vw] lg:text-[8.4vw] text-balance">
+          <span className="reveal-line"><span style={{ animationDelay: "0.05s" }}>Quiet machines.</span></span>
+          <br />
+          <span className="reveal-line">
+            <span style={{ animationDelay: "0.18s" }} className="text-white/35">Loud results.</span>
+          </span>
+        </h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.75, duration: 0.5 }}
-            className="mt-10 flex flex-wrap gap-3"
-          >
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.6 }}
+          className="mt-10 max-w-xl text-white/60 text-base md:text-lg leading-relaxed"
+        >
+          Blayake is a senior team of engineers and designers building bespoke AI systems —
+          automations, chatbots, content engines and the websites that put them to work.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.05, duration: 0.5 }}
+          className="mt-10 flex flex-wrap gap-3 items-center"
+        >
+          <Magnetic strength={0.25}>
             <a
               href="#contact"
               data-testid="hero-cta-start"
-              className="group inline-flex items-center gap-2 bg-tangerine hover:bg-tangerine-hover text-ink-900 font-mono-tech text-[11px] font-bold uppercase tracking-[0.22em] px-6 py-4 rounded-sm transition-all hover:-translate-y-0.5"
+              data-cursor="hover"
+              className="group inline-flex items-center gap-2 bg-white text-black text-sm font-semibold px-6 py-3.5 rounded-full hover:bg-white/90 transition"
             >
-              Start a Project
-              <ArrowRight className="w-4 h-4" />
+              Start a project
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </a>
+          </Magnetic>
+          <Magnetic strength={0.18}>
             <a
               href="#work"
               data-testid="hero-cta-work"
-              className="inline-flex items-center gap-2 border border-ink-500 hover:border-tangerine hover:text-tangerine font-mono-tech text-[11px] font-bold uppercase tracking-[0.22em] px-6 py-4 rounded-sm transition-colors"
+              data-cursor="hover"
+              className="inline-flex items-center gap-2 border border-white/15 hover:border-white/40 text-sm font-medium px-6 py-3.5 rounded-full transition-colors"
             >
-              See Selected Work
+              Selected work
             </a>
-          </motion.div>
-        </div>
-
-        <div className="lg:col-span-5">
-          <HeroPanel />
-        </div>
+          </Magnetic>
+        </motion.div>
       </div>
     </section>
   );
 }
 
-function HeroPanel() {
-  const bars = useMemo(
-    () => [
-      { l: "Pipeline Automations", v: 94 },
-      { l: "Throughput Lift", v: 88 },
-      { l: "Cost / Output", v: 41 },
-    ],
-    []
-  );
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 28 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="relative border border-ink-500 bg-ink-800/60 backdrop-blur-md p-7 rounded-sm"
-      data-testid="hero-panel"
-    >
-      <div className="flex items-center justify-between mb-8">
-        <span className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300">
-          / SYSTEM_STATUS.live
-        </span>
-        <span className="inline-flex items-center gap-2 font-mono-tech text-[10px] uppercase tracking-[0.22em] text-tangerine">
-          <span className="w-1.5 h-1.5 rounded-full bg-tangerine animate-pulse" />
-          ACTIVE
-        </span>
-      </div>
-
-      <div className="space-y-7">
-        {bars.map((b, i) => (
-          <div key={b.l}>
-            <div className="flex justify-between font-mono-tech text-[11px] uppercase tracking-[0.18em]">
-              <span className="text-ink-200">{b.l}</span>
-              <span className="text-tangerine">{b.v}%</span>
-            </div>
-            <div className="mt-2 h-[2px] bg-ink-500/60 overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${b.v}%` }}
-                transition={{ duration: 1.2, delay: 0.7 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
-                className="h-full bg-tangerine"
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-10 grid grid-cols-2 gap-3 font-mono-tech text-[10px] uppercase tracking-[0.2em] text-ink-300">
-        <div className="border border-ink-500 p-3"><div className="text-ink-100 text-2xl font-display font-bold tracking-tight">42ms</div>p95 latency</div>
-        <div className="border border-ink-500 p-3"><div className="text-ink-100 text-2xl font-display font-bold tracking-tight">99.97%</div>uptime / 90d</div>
-      </div>
-    </motion.div>
-  );
-}
-
 function Marquee() {
-  const items = ["AI AUTOMATION", "CUSTOM LLMS", "RAG", "WORKFLOW DESIGN", "CONTENT ENGINES", "EVALS", "DEPLOY", "OBSERVABILITY"];
+  const items = ["AI AUTOMATION", "CUSTOM LLMS", "RAG", "WORKFLOW", "CONTENT", "EVALS", "DEPLOY"];
   const stream = [...items, ...items, ...items];
   return (
-    <div className="border-y border-ink-600 bg-ink-900/60 py-6 overflow-hidden">
-      <div className="marquee-track gap-16 px-8">
+    <div className="border-y border-white/[0.06] py-7 overflow-hidden">
+      <div className="marquee-track gap-14 px-8 items-center">
         {stream.map((it, i) => (
           <span
             key={i}
-            className="font-display font-black text-3xl md:text-5xl tracking-tighter text-ink-700 whitespace-nowrap inline-flex items-center gap-16"
+            className="font-display font-black text-3xl md:text-5xl tracking-tighter text-white/10 whitespace-nowrap inline-flex items-center gap-14"
           >
             {it}
-            <span className="text-tangerine">✦</span>
+            <span className="text-white/20 text-2xl">/</span>
           </span>
         ))}
       </div>
@@ -316,57 +193,58 @@ function Marquee() {
   );
 }
 
-function SectionLabel({ index, kicker, children, className = "" }) {
-  return (
-    <div className={`mb-14 md:mb-20 ${className}`}>
-      <div className="flex items-center gap-3 mb-6 font-mono-tech text-[10px] uppercase tracking-[0.32em] text-tangerine">
-        <span>/ {index}</span>
-        <span className="text-ink-300">— {kicker}</span>
-      </div>
-      <h2 className="font-display font-black text-4xl md:text-6xl tracking-tighter leading-[0.95] max-w-4xl text-balance">
-        {children}
-      </h2>
-    </div>
-  );
-}
-
 function Services() {
-  const reveal = useReveal();
   return (
-    <section id="services" className="relative py-24 md:py-32 px-6 md:px-12 max-w-7xl mx-auto">
-      <SectionLabel index="01" kicker="Capabilities">
-        Four disciplines. <span className="text-ink-400">One operating system</span> for your business.
-      </SectionLabel>
+    <section id="services" className="relative py-28 md:py-40 px-6 md:px-12 max-w-7xl mx-auto">
+      <div className="flex items-end justify-between gap-8 flex-wrap mb-16">
+        <div>
+          <div className="font-mono-tech text-[10px] uppercase tracking-[0.32em] text-white/40 mb-5">
+            / Services
+          </div>
+          <h2 className="font-display font-black text-4xl md:text-6xl tracking-tighter leading-[0.95] max-w-2xl text-balance">
+            Four disciplines. <span className="text-white/40">One operating system.</span>
+          </h2>
+        </div>
+        <p className="max-w-sm text-white/60 leading-relaxed">
+          We design, build, and operate the AI infrastructure that quietly does the work behind your business.
+        </p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {SERVICES.map((s, i) => {
           const Icon = s.icon;
           return (
-            <motion.div
-              key={s.id}
-              {...reveal}
-              transition={{ ...reveal.transition, delay: i * 0.07 }}
-              className={`trace-border ${s.span} group relative border border-ink-500 hover:border-tangerine/60 bg-ink-800/40 p-8 md:p-10 rounded-sm transition-all hover:-translate-y-1 overflow-hidden`}
-              data-testid={`service-card-${s.id}`}
+            <motion.article
+              key={s.n}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -4 }}
+              className="group relative glass rounded-3xl p-3 overflow-hidden"
+              data-testid={`service-card-${s.n}`}
+              data-cursor="hover"
             >
-              <div className="flex items-start justify-between mb-10">
-                <span className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300">
-                  / {s.id}
-                </span>
-                <Icon className="w-6 h-6 text-ink-300 group-hover:text-tangerine transition-colors" strokeWidth={1.4} />
+              <div className="card-img-frame relative aspect-[16/10] rounded-2xl overflow-hidden">
+                <img
+                  src={s.img}
+                  alt={s.title}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover grayscale opacity-40 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute top-4 left-4 flex items-center gap-2 font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/60">
+                  <span>/ {s.n}</span>
+                </div>
+                <div className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 backdrop-blur-md grid place-items-center group-hover:bg-white group-hover:text-black transition-colors">
+                  <Icon className="w-4 h-4" strokeWidth={1.6} />
+                </div>
               </div>
-              <h3 className="font-display font-bold text-3xl md:text-4xl tracking-tight leading-[1] mb-5">
-                {s.title}
-              </h3>
-              <p className="text-ink-300 max-w-md leading-relaxed">{s.blurb}</p>
-              <div className="mt-8 flex flex-wrap gap-2">
-                {s.tags.map((t) => (
-                  <span key={t} className="font-mono-tech text-[10px] uppercase tracking-[0.18em] text-ink-300 border border-ink-500 px-2.5 py-1 rounded-sm">
-                    {t}
-                  </span>
-                ))}
+              <div className="p-5 pt-6">
+                <h3 className="font-display font-bold text-2xl tracking-tight mb-2.5">{s.title}</h3>
+                <p className="text-white/55 leading-relaxed text-[15px]">{s.blurb}</p>
               </div>
-            </motion.div>
+            </motion.article>
           );
         })}
       </div>
@@ -374,140 +252,49 @@ function Services() {
   );
 }
 
-function Stats() {
-  const reveal = useReveal();
+function Work() {
   return (
-    <section className="relative py-20 md:py-28 px-6 md:px-12 border-y border-ink-600 bg-ink-800/30">
-      <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4">
-        {STATS.map((s, i) => (
-          <motion.div
-            key={s.label}
-            {...reveal}
-            transition={{ ...reveal.transition, delay: i * 0.08 }}
-            className={`p-6 md:p-10 ${i !== 0 ? "md:border-l border-ink-600" : ""} ${i < 2 ? "border-b md:border-b-0 border-ink-600" : ""}`}
-            data-testid={`stat-${i}`}
-          >
-            <div className="font-display font-black text-5xl md:text-7xl tracking-tighter leading-none">
-              {s.value}
-            </div>
-            <div className="mt-3 font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300">
-              {s.label}
-            </div>
-          </motion.div>
-        ))}
+    <section id="work" className="relative py-28 md:py-40 px-6 md:px-12 max-w-7xl mx-auto">
+      <div className="font-mono-tech text-[10px] uppercase tracking-[0.32em] text-white/40 mb-5">
+        / Selected work
       </div>
-    </section>
-  );
-}
-
-function Process() {
-  const reveal = useReveal();
-  return (
-    <section id="process" className="relative py-24 md:py-32 px-6 md:px-12 max-w-7xl mx-auto">
-      <SectionLabel index="02" kicker="The Process">
-        From scoping call to <span className="text-tangerine">production</span> in weeks, not quarters.
-      </SectionLabel>
-      <div className="grid grid-cols-1 md:grid-cols-4 border-t border-l border-ink-600">
-        {PROCESS.map((p, i) => (
-          <motion.div
-            key={p.n}
-            {...reveal}
-            transition={{ ...reveal.transition, delay: i * 0.08 }}
-            className="p-8 md:p-10 border-b border-r border-ink-600 group hover:bg-ink-800/40 transition-colors"
-            data-testid={`process-step-${p.n}`}
-          >
-            <div className="font-mono-tech text-[10px] uppercase tracking-[0.32em] text-tangerine mb-10">
-              / {p.n}
-            </div>
-            <h3 className="font-display font-bold text-3xl tracking-tight mb-5">{p.t}</h3>
-            <p className="text-ink-300 text-sm leading-relaxed">{p.d}</p>
-            <Zap className="w-4 h-4 text-ink-500 mt-8 group-hover:text-tangerine transition-colors" strokeWidth={1.5} />
-          </motion.div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function CaseStudies() {
-  const reveal = useReveal();
-  return (
-    <section id="work" className="relative py-24 md:py-32 px-6 md:px-12 max-w-7xl mx-auto">
-      <SectionLabel index="03" kicker="Selected Work">
-        Quiet machines, <span className="text-ink-400">loud results.</span>
-      </SectionLabel>
-
-      <div className="space-y-4">
-        {CASES.map((c, i) => (
+      <h2 className="font-display font-black text-4xl md:text-6xl tracking-tighter leading-[0.95] max-w-3xl mb-16 text-balance">
+        Receipts, <span className="text-white/40">not promises.</span>
+      </h2>
+      <div className="border-t border-white/[0.08]">
+        {WORK.map((w, i) => (
           <motion.a
-            key={c.title}
+            key={w.title}
             href="#contact"
-            {...reveal}
-            transition={{ ...reveal.transition, delay: i * 0.08 }}
-            className="group block border border-ink-500 hover:border-tangerine/60 bg-ink-800/30 rounded-sm overflow-hidden transition-colors"
-            data-testid={`case-card-${i}`}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: i * 0.06 }}
+            data-testid={`work-row-${i}`}
+            data-cursor="view"
+            data-cursor-label="View"
+            className="group flex items-center justify-between gap-6 py-7 md:py-9 border-b border-white/[0.08] hover:bg-white/[0.02] transition-colors px-1"
           >
-            <div className="grid grid-cols-1 md:grid-cols-12 items-stretch">
-              <div className="md:col-span-4 relative aspect-[16/10] md:aspect-auto overflow-hidden">
-                <img
-                  src={c.img}
-                  alt={c.title}
-                  loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-ink-900/70 to-transparent" />
-              </div>
-              <div className="md:col-span-6 p-8 md:p-10 flex flex-col justify-center">
-                <div className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300 mb-4">
-                  {c.client}
+            <div className="flex items-center gap-6 md:gap-10 min-w-0">
+              <span className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/40 hidden md:block w-12">
+                0{i + 1}
+              </span>
+              <div className="min-w-0">
+                <div className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/40 mb-2">
+                  {w.client}
                 </div>
-                <h3 className="font-display font-bold text-2xl md:text-4xl tracking-tight leading-[1.05] text-balance">
-                  {c.title}
+                <h3 className="font-display font-bold text-2xl md:text-4xl tracking-tight leading-[1.05] truncate group-hover:translate-x-2 transition-transform duration-500">
+                  {w.title}
                 </h3>
               </div>
-              <div className="md:col-span-2 p-8 md:p-10 md:border-l border-ink-500 flex flex-col justify-center items-start md:items-end">
-                <div className="font-display font-black text-5xl text-tangerine tracking-tighter leading-none">
-                  {c.metric}
-                </div>
-                <div className="mt-2 font-mono-tech text-[10px] uppercase tracking-[0.22em] text-ink-300">
-                  {c.metricLabel}
-                </div>
-                <ArrowUpRight className="mt-6 w-5 h-5 text-ink-300 group-hover:text-tangerine group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-              </div>
+            </div>
+            <div className="flex items-center gap-6 shrink-0">
+              <span className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/40 hidden sm:block">
+                {w.year}
+              </span>
+              <ArrowUpRight className="w-5 h-5 text-white/40 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
             </div>
           </motion.a>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function Testimonials() {
-  const reveal = useReveal();
-  return (
-    <section className="relative py-24 md:py-32 px-6 md:px-12 max-w-7xl mx-auto">
-      <SectionLabel index="04" kicker="In their words">
-        Operators who refuse to <span className="text-ink-400">do it the old way.</span>
-      </SectionLabel>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {TESTIMONIALS.map((t, i) => (
-          <motion.figure
-            key={t.name}
-            {...reveal}
-            transition={{ ...reveal.transition, delay: i * 0.08 }}
-            className="border border-ink-500 bg-ink-800/30 p-7 rounded-sm flex flex-col"
-            data-testid={`testimonial-${i}`}
-          >
-            <div className="font-display text-tangerine text-5xl leading-none mb-4">"</div>
-            <blockquote className="text-ink-100 leading-relaxed flex-1">{t.quote}</blockquote>
-            <figcaption className="mt-7 flex items-center gap-3 pt-5 border-t border-ink-600">
-              <img src={t.avatar} alt={t.name} loading="lazy" className="w-10 h-10 rounded-full object-cover grayscale" />
-              <div>
-                <div className="font-display font-bold text-sm">{t.name}</div>
-                <div className="font-mono-tech text-[10px] uppercase tracking-[0.2em] text-ink-300">{t.role}</div>
-              </div>
-            </figcaption>
-          </motion.figure>
         ))}
       </div>
     </section>
@@ -517,26 +304,30 @@ function Testimonials() {
 function Faq() {
   const [open, setOpen] = useState(0);
   return (
-    <section id="faq" className="relative py-24 md:py-32 px-6 md:px-12 max-w-3xl mx-auto">
-      <SectionLabel index="05" kicker="Questions">
-        Things people ask <span className="text-ink-400">before signing.</span>
-      </SectionLabel>
-      <div className="border-t border-ink-600">
+    <section className="relative py-28 md:py-32 px-6 md:px-12 max-w-3xl mx-auto">
+      <div className="font-mono-tech text-[10px] uppercase tracking-[0.32em] text-white/40 mb-5">
+        / FAQ
+      </div>
+      <h2 className="font-display font-black text-4xl md:text-5xl tracking-tighter leading-[0.95] mb-12 text-balance">
+        Things people ask <span className="text-white/40">before signing.</span>
+      </h2>
+      <div className="border-t border-white/[0.08]">
         {FAQ.map((f, i) => {
           const isOpen = open === i;
           return (
-            <div key={f.q} className="border-b border-ink-600">
+            <div key={f.q} className="border-b border-white/[0.08]">
               <button
                 type="button"
                 onClick={() => setOpen(isOpen ? -1 : i)}
                 className="w-full flex items-center justify-between gap-6 py-6 text-left group"
                 data-testid={`faq-toggle-${i}`}
+                data-cursor="hover"
                 aria-expanded={isOpen}
               >
-                <span className="font-display font-bold text-lg md:text-xl tracking-tight group-hover:text-tangerine transition-colors">
+                <span className="font-display font-semibold text-lg md:text-xl tracking-tight group-hover:text-white transition-colors">
                   {f.q}
                 </span>
-                <span className="shrink-0 w-9 h-9 border border-ink-500 grid place-items-center rounded-sm group-hover:border-tangerine group-hover:text-tangerine transition-colors">
+                <span className="shrink-0 w-9 h-9 border border-white/10 grid place-items-center rounded-full group-hover:border-white/40 transition-colors">
                   {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                 </span>
               </button>
@@ -546,10 +337,10 @@ function Faq() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                     className="overflow-hidden"
                   >
-                    <p className="pb-6 pr-12 text-ink-300 leading-relaxed">{f.a}</p>
+                    <p className="pb-6 pr-12 text-white/60 leading-relaxed">{f.a}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -562,7 +353,7 @@ function Faq() {
 }
 
 function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", company: "", project_type: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [status, setStatus] = useState({ state: "idle", msg: "" });
 
   const update = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -571,16 +362,14 @@ function Contact() {
     e.preventDefault();
     setStatus({ state: "loading", msg: "" });
     try {
-      const payload = {
+      await axios.post(`${API}/leads`, {
         name: form.name.trim(),
         email: form.email.trim(),
-        company: form.company.trim() || null,
-        project_type: form.project_type || null,
-        message: form.message.trim(),
-      };
-      await axios.post(`${API}/leads`, payload);
+        phone: form.phone.trim() || null,
+        message: form.message.trim() || null,
+      });
       setStatus({ state: "success", msg: "Got it. We'll be in touch within 24 hours." });
-      setForm({ name: "", email: "", company: "", project_type: "", message: "" });
+      setForm({ name: "", email: "", phone: "", message: "" });
     } catch (err) {
       const msg = err?.response?.data?.detail || "Something went wrong. Please try again.";
       setStatus({ state: "error", msg: typeof msg === "string" ? msg : "Validation error." });
@@ -588,124 +377,87 @@ function Contact() {
   };
 
   const fieldCls =
-    "w-full bg-transparent border-b border-ink-500 focus:border-tangerine outline-none py-3 px-0 font-sans text-ink-100 placeholder:text-ink-400 transition-colors";
+    "w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/40 outline-none rounded-2xl px-5 py-4 text-white placeholder:text-white/30 transition-colors";
 
   return (
-    <section id="contact" className="relative py-24 md:py-32 px-6 md:px-12 max-w-7xl mx-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-        <div className="lg:col-span-5">
-          <div className="font-mono-tech text-[10px] uppercase tracking-[0.32em] text-tangerine mb-6">
-            / 06 — Book a Call
-          </div>
-          <h2 className="font-display font-black text-5xl md:text-7xl tracking-tighter leading-[0.92]">
-            Ready to <br /> automate the boring?
-          </h2>
-          <p className="mt-8 text-ink-300 max-w-md leading-relaxed">
-            Tell us where you're stuck. We'll send back a 1-page diagnosis within 24 hours — no
-            slide deck, no funnel.
-          </p>
-          <div className="mt-10 space-y-3 font-mono-tech text-[11px] uppercase tracking-[0.22em] text-ink-300">
-            <div>HELLO @ BLAYAKE.AGENCY</div>
-            <div>REMOTE / LISBON · NYC · BENGALURU</div>
-          </div>
+    <section id="contact" className="relative py-28 md:py-40 px-6 md:px-12 max-w-4xl mx-auto">
+      <div className="text-center">
+        <div className="font-mono-tech text-[10px] uppercase tracking-[0.32em] text-white/40 mb-5">
+          / Let's build
         </div>
-
-        <form onSubmit={submit} className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6" data-testid="contact-form">
-          <div>
-            <label className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300">Name *</label>
-            <input required value={form.name} onChange={update("name")} className={fieldCls} placeholder="Jane Doe" data-testid="form-name" />
-          </div>
-          <div>
-            <label className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300">Email *</label>
-            <input required type="email" value={form.email} onChange={update("email")} className={fieldCls} placeholder="jane@company.com" data-testid="form-email" />
-          </div>
-          <div>
-            <label className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300">Company</label>
-            <input value={form.company} onChange={update("company")} className={fieldCls} placeholder="Acme Inc." data-testid="form-company" />
-          </div>
-          <div>
-            <label className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300">Project Type</label>
-            <select value={form.project_type} onChange={update("project_type")} className={`${fieldCls} appearance-none`} data-testid="form-project-type">
-              <option value="" className="bg-ink-900">Select…</option>
-              <option value="automation" className="bg-ink-900">AI Automation</option>
-              <option value="content" className="bg-ink-900">Content System</option>
-              <option value="chatbot" className="bg-ink-900">Custom Chatbot</option>
-              <option value="website" className="bg-ink-900">Website</option>
-              <option value="other" className="bg-ink-900">Other</option>
-            </select>
-          </div>
-          <div className="md:col-span-2">
-            <label className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300">Where are you stuck? *</label>
-            <textarea
-              required
-              minLength={5}
-              rows={4}
-              value={form.message}
-              onChange={update("message")}
-              className={`${fieldCls} resize-none`}
-              placeholder="Tell us about the problem, your stack, and what success looks like."
-              data-testid="form-message"
-            />
-          </div>
-          <div className="md:col-span-2 flex items-center justify-between gap-6 pt-4">
-            <div className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-ink-300 min-h-[1rem]" data-testid="form-status">
-              {status.state === "loading" && "Sending…"}
-              {status.state === "success" && <span className="text-tangerine">{status.msg}</span>}
-              {status.state === "error" && <span className="text-red-400">{status.msg}</span>}
-            </div>
-            <button
-              type="submit"
-              disabled={status.state === "loading"}
-              data-testid="form-submit"
-              className="group inline-flex items-center gap-2 bg-tangerine hover:bg-tangerine-hover disabled:opacity-50 text-ink-900 font-mono-tech text-[11px] font-bold uppercase tracking-[0.22em] px-6 py-4 rounded-sm transition-all hover:-translate-y-0.5"
-            >
-              Send Brief
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-            </button>
-          </div>
-        </form>
+        <h2 className="font-display font-black text-5xl md:text-7xl tracking-tighter leading-[0.92] text-balance">
+          Let's build the <br /> <span className="text-white/40 italic font-medium">future.</span>
+        </h2>
+        <p className="mt-6 text-white/60 max-w-md mx-auto leading-relaxed">
+          Drop your details below and we'll get back to you within 24 hours.
+        </p>
       </div>
+
+      <form onSubmit={submit} className="mt-14 glass rounded-3xl p-6 md:p-8 space-y-4" data-testid="contact-form">
+        <div>
+          <label className="block font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/50 mb-2">Full Name</label>
+          <input required value={form.name} onChange={update("name")} className={fieldCls} placeholder="e.g. Julian Anderson" data-testid="form-name" data-cursor="hover" />
+        </div>
+        <div>
+          <label className="block font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/50 mb-2">Email Address</label>
+          <input required type="email" value={form.email} onChange={update("email")} className={fieldCls} placeholder="julian@visionary.ai" data-testid="form-email" data-cursor="hover" />
+        </div>
+        <div>
+          <label className="block font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/50 mb-2">Phone Number</label>
+          <input type="tel" value={form.phone} onChange={update("phone")} className={fieldCls} placeholder="+1 (415) 867-5309" data-testid="form-phone" data-cursor="hover" />
+        </div>
+        <div>
+          <label className="block font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/50 mb-2">What are you trying to build?</label>
+          <textarea rows={3} value={form.message} onChange={update("message")} className={`${fieldCls} resize-none`} placeholder="A quick line about your idea, stack, or stuck-point." data-testid="form-message" data-cursor="hover" />
+        </div>
+        <Magnetic strength={0.12} className="block w-full">
+          <button
+            type="submit"
+            disabled={status.state === "loading"}
+            data-testid="form-submit"
+            data-cursor="hover"
+            className="w-full inline-flex items-center justify-center gap-2 bg-white text-black font-semibold px-6 py-4 rounded-full hover:bg-white/90 disabled:opacity-50 transition-all"
+          >
+            {status.state === "loading" ? "Sending…" : "Submit Request"}
+            {status.state !== "loading" && <ArrowRight className="w-4 h-4" />}
+          </button>
+        </Magnetic>
+        <div className="text-center font-mono-tech text-[10px] uppercase tracking-[0.22em] min-h-[1rem]" data-testid="form-status">
+          {status.state === "success" && <span className="text-emerald-400">{status.msg}</span>}
+          {status.state === "error" && <span className="text-red-400">{status.msg}</span>}
+        </div>
+      </form>
     </section>
   );
 }
 
 function Footer() {
   return (
-    <footer className="relative pt-16 pb-6 px-6 md:px-12 border-t border-ink-600 overflow-hidden">
-      <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 pb-16">
-        <div className="col-span-2">
-          <div className="font-display font-bold text-xl">BLAYAKE</div>
-          <p className="mt-4 text-ink-300 text-sm max-w-xs leading-relaxed">
+    <footer className="relative pt-16 pb-6 px-6 md:px-12 border-t border-white/[0.06] overflow-hidden">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-10 md:gap-0 md:items-end justify-between pb-12">
+        <div>
+          <div className="font-display font-bold text-xl">Blayake</div>
+          <p className="mt-3 text-white/50 text-sm max-w-xs leading-relaxed">
             A senior team building bespoke AI systems for operators who refuse to be ignored.
           </p>
         </div>
-        <div>
-          <div className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300 mb-4">Studio</div>
-          <ul className="space-y-2 font-display text-sm">
-            <li><a href="#work" className="link-underline">Work</a></li>
-            <li><a href="#services" className="link-underline">Services</a></li>
-            <li><a href="#process" className="link-underline">Process</a></li>
-          </ul>
-        </div>
-        <div>
-          <div className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300 mb-4">Social</div>
-          <ul className="space-y-2 font-display text-sm">
-            <li><a href="#" className="link-underline">Twitter / X</a></li>
-            <li><a href="#" className="link-underline">LinkedIn</a></li>
-            <li><a href="#" className="link-underline">Instagram</a></li>
-          </ul>
+        <div className="flex flex-wrap gap-x-10 gap-y-4 font-mono-tech text-[11px] uppercase tracking-[0.22em] text-white/50">
+          <a href="#" className="link-underline" data-cursor="hover">Twitter / X</a>
+          <a href="#" className="link-underline" data-cursor="hover">LinkedIn</a>
+          <a href="#" className="link-underline" data-cursor="hover">Instagram</a>
+          <a href="mailto:hello@blayake.agency" className="link-underline" data-cursor="hover">hello@blayake.agency</a>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-end justify-between gap-6 pt-8 border-t border-ink-600">
-        <div className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300">
-          © 2026 Blayake Agency · All systems go
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-6 pt-6 border-t border-white/[0.06]">
+        <div className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/40">
+          © 2026 Blayake Agency
         </div>
-        <div className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-ink-300">
-          Built in-house with Lenis × Framer Motion
+        <div className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/40">
+          All systems go
         </div>
       </div>
-      <div aria-hidden className="-mb-[3vw] mt-8 select-none">
-        <div className="font-display font-black text-[22vw] leading-[0.85] tracking-[-0.06em] text-ink-700/70 whitespace-nowrap text-center">
+      <div aria-hidden className="select-none mt-6 -mb-[3vw]">
+        <div className="font-display font-black text-[22vw] leading-[0.85] tracking-[-0.06em] text-white/[0.04] whitespace-nowrap text-center">
           BLAYAKE
         </div>
       </div>
@@ -721,7 +473,7 @@ export default function Blayake() {
   // Lenis smooth scroll
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.1,
+      duration: 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
@@ -743,15 +495,18 @@ export default function Blayake() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-ink-900 text-ink-100 hairline-grid grain">
-      {/* Ambient embers */}
-      <div className="fixed top-1/3 -right-40 w-[640px] h-[640px] ember pointer-events-none -z-0" />
-      <div className="fixed -bottom-40 -left-40 w-[520px] h-[520px] ember pointer-events-none -z-0 opacity-70" />
+    <div className="relative min-h-screen bg-[#050505] text-white dot-grid grain">
+      {/* Custom cursor (auto-disabled on touch) */}
+      <Cursor />
+
+      {/* Soft halos */}
+      <div className="fixed top-1/4 -right-40 w-[640px] h-[640px] halo pointer-events-none -z-0" />
+      <div className="fixed bottom-1/3 -left-40 w-[520px] h-[520px] halo pointer-events-none -z-0 opacity-70" />
 
       {/* Scroll progress */}
       <motion.div
         style={{ scaleX }}
-        className="fixed top-0 left-0 right-0 h-[2px] bg-tangerine origin-left z-[60]"
+        className="fixed top-0 left-0 right-0 h-[2px] bg-white origin-left z-[60]"
         data-testid="scroll-progress"
       />
 
@@ -761,10 +516,7 @@ export default function Blayake() {
           <Hero />
           <Marquee />
           <Services />
-          <Stats />
-          <Process />
-          <CaseStudies />
-          <Testimonials />
+          <Work />
           <Faq />
           <Contact />
         </main>
