@@ -2,8 +2,6 @@ import { LogoMark, Wordmark } from "@/components/Logo";
 
 const SOCIALS = [
   { id: "x", label: "@blayake on X", href: "https://x.com/blayake", external: true, testid: "footer-x" },
-  { id: "linkedin", label: "LinkedIn", href: "#", external: false, testid: "footer-linkedin" },
-  { id: "instagram", label: "Instagram", href: "#", external: false, testid: "footer-instagram" },
   {
     id: "email",
     label: "teamblayake.agency@gmail.com",

@@ -60,10 +60,10 @@ function WorkPreview({ active, x, y }) {
   return (
     <motion.div
       aria-hidden
-      style={{ x, y, translateX: "-50%", translateY: "-50%" }}
-      animate={{ opacity: active !== null ? 1 : 0, scale: active !== null ? 1 : 0.92 }}
-      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="pointer-events-none absolute top-0 left-0 w-72 md:w-96 aspect-[4/3] rounded-2xl overflow-hidden hidden md:block z-20"
+      style={{ x, y, translateX: "32px", translateY: "32px" }}
+      animate={{ opacity: active !== null ? 1 : 0, scale: active !== null ? 1 : 0.9 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="pointer-events-none absolute top-0 left-0 w-44 aspect-[4/3] rounded-xl overflow-hidden hidden lg:block z-20 shadow-[0_24px_50px_rgba(0,0,0,0.6)] ring-1 ring-white/10"
     >
       {WORK.map((w, i) => (
         <motion.img
@@ -72,14 +72,14 @@ function WorkPreview({ active, x, y }) {
           alt=""
           loading="lazy"
           animate={{ opacity: active === i ? 1 : 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.35 }}
           className="absolute inset-0 w-full h-full object-cover"
         />
       ))}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between font-mono-tech text-[10px] uppercase tracking-[0.22em] text-white/90">
-        <span>{current ? current.client : ""}</span>
-        <span>{current ? current.year : ""}</span>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20" />
+      <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between font-mono-tech text-[8px] uppercase tracking-[0.18em] text-white/95">
+        <span className="truncate">{current ? current.year : ""}</span>
+        <ArrowUpRight className="w-2.5 h-2.5 shrink-0" />
       </div>
     </motion.div>
   );

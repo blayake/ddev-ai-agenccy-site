@@ -1,0 +1,32 @@
+{
+  "summary": "Iteration 6 UX-polish verified end-to-end at 1920x1080. Footer reduced to X + email only (LinkedIn/Instagram testids removed). Cursor-following preview tooltip now small (w-44) with translateX/Y 32px offset to bottom-right of cursor in BOTH Services (aspect 4/5) and Work (aspect 4/3) — measured offsetRight=32, offsetDown=32-33 — title text remains visible & not occluded. All regressions intact: custom cursor (DISCOVER/VIEW labels), magnetic CTAs, services+work dim hover, contact form e2e -> 201 + 'Resend sent id=' fired. Backend pytest 7/7. 0 console errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_blayake_api.py",
+    "/app/test_reports/pytest/iteration_6.xml"
+  ],
+  "verified_checks": {
+    "backend_pytest": "7/7 PASSED — health, lead create (+phone+message), required-only, invalid email 422, missing name 422, missing email 422, list-leads sorted desc + no _id + phone present",
+    "footer_socials": "footer-x present (text='@BLAYAKE ON X', href=https://x.com/blayake), footer-email present (href=mailto:teamblayake.agency@gmail.com); footer-linkedin and footer-instagram REMOVED (querySelector returns null)",
+    "services_preview_offset": "service-row-03 hover -> preview rect=(600,725) w=176 h=220, cursor=(568,692) -> offsetRight=32px offsetDown=32px (matches translateX:32px translateY:32px). className contains 'w-44 aspect-[4/5]'. Row title 'Short-Form Content' remains in DOM and visible during hover.",
+    "work_preview_offset": "work-row-1 hover -> preview rect=(600,509) w=176 h=132, cursor=(568,476) -> offsetRight=32px offsetDown=33px. className contains 'w-44 aspect-[4/3]'. Row title 'AI support deflected 62% of tickets' remains visible.",
+    "cursor_regression": "cursor-dot + cursor-ring present, ring label='DISCOVER' on service-row hover (custom cursor view-mode works)",
+    "services_dim_hover_02": "[01:0.25, 02:1.00, 03:0.25, 04:0.25, 05:0.25] — exact spec",
+    "contact_form_e2e": "TEST_iter6_user submitted -> form-status='GOT IT. WE\\'LL BE IN TOUCH WITHIN 24 HOURS.' Backend log: 'Resend sent id=d1ca8d05-c0cb-48b8-8938-263f6b819754 to=[teamblayake.agency@gmail.com]' confirms email background task fired. Auto-reply correctly skipped (AUTOREPLY_ENABLED=false).",
+    "console_errors": 0
+  },
+  "critical_code_review_comments": [
+    "PreviewCard/WorkPreview style uses BOTH framer x/y motion values AND translateX/Y:'32px' — framer concatenates these into transform: 'translateX(199px) translateY(312px) translateX(32px) translateY(32px)'. This works (last translateX overrides — actually both are applied additively, giving the desired spring + 32px offset). Acceptable, but slightly fragile if framer changes serialization; could be cleaner to add 32 inside onMove (mx.set(e.clientX-rect.left+32)).",
+    "Resend integration verified live. RESEND_API_KEY in /app/backend/.env, AUTOREPLY_ENABLED=false (Resend test-mode constraint, expected per request).",
+    "All 39 data-testids preserved (footer-linkedin/-instagram removed by design; net 41 -> 39)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (7/7)", "frontend": "100%"},
+  "test_credentials": "n/a",
+  "seed_data_creation": "Created lead TEST_Iter6_User / TEST_iter6@example.com via UI form submission for Resend live verification",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Preview offset measurement: hover service/work row, then in JS read preview.getBoundingClientRect() vs cursor coords -> offsetRight & offsetDown should both equal 32 (within 1-2px due to spring). Preview transform string contains FOUR translates (spring x, spring y, +32 x, +32 y) which is intentional. Resend log marker: 'Resend sent id=' in /var/log/supervisor/backend.err.log after each /api/leads POST. AUTOREPLY_ENABLED=false is expected (Resend test mode).",
+  "rca_of_the_issue": "n/a — no bugs."
+}
