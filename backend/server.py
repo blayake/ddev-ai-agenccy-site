@@ -6,7 +6,7 @@ import os
 import uuid
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi import APIRouter, BackgroundTasks, FastAPI, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from starlette.middleware.cors import CORSMiddleware
@@ -20,6 +20,9 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger: logging.Logger = logging.getLogger(__name__)
+
+# Email service is imported AFTER load_dotenv so it picks up RESEND_API_KEY.
+from email_service import send_lead_notification  # noqa: E402
 
 mongo_url: str = os.environ["MONGO_URL"]
 client: AsyncIOMotorClient = AsyncIOMotorClient(mongo_url)
@@ -103,7 +106,7 @@ async def get_status_checks() -> List[StatusCheck]:
 
 
 @api_router.post("/leads", response_model=Lead, status_code=201)
-async def create_lead(payload: LeadCreate) -> Lead:
+async def create_lead(payload: LeadCreate, background_tasks: BackgroundTasks) -> Lead:
     obj: Lead = Lead(**payload.model_dump())
     doc: dict = obj.model_dump()
     _serialize_datetime(doc, "created_at")
@@ -112,6 +115,16 @@ async def create_lead(payload: LeadCreate) -> Lead:
     except Exception as exc:
         logger.exception("Failed to insert lead")
         raise HTTPException(status_code=500, detail="Could not save lead") from exc
+
+    # Fire-and-forget notification + optional auto-reply
+    background_tasks.add_task(
+        send_lead_notification,
+        obj.name,
+        obj.email,
+        obj.phone,
+        obj.message,
+        obj.created_at,
+    )
     return obj
 
 
