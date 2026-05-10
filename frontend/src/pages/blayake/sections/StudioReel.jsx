@@ -8,7 +8,8 @@ export default function StudioReel() {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"]);
-  const titleX = useTransform(scrollYProgress, [0, 1], ["10%", "-25%"]);
+  // Faster horizontal swipe — completes during the middle 45% of the section scroll
+  const titleX = useTransform(scrollYProgress, [0.25, 0.7], ["18%", "-32%"]);
   const overlay = useTransform(scrollYProgress, [0, 0.5, 1], [0.7, 0.45, 0.7]);
 
   return (
@@ -35,14 +36,9 @@ export default function StudioReel() {
         </motion.div>
       </div>
 
-      <div className="absolute top-8 left-8 right-8 flex justify-between font-mono-tech text-[10px] uppercase tracking-[0.28em] text-white/60">
-        <span>/ STUDIO_REEL — 2026</span>
-        <span>SHIPPED THIS WEEK · 4</span>
-      </div>
       <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end gap-6">
         <div className="max-w-md text-white/70 leading-relaxed text-sm md:text-base">
-          A small studio that publishes its work, its process, and the receipts. Watch what we
-          ship — every Friday.
+          A small studio that publishes its work, its process, and the receipts.
         </div>
         <Magnetic strength={0.2}>
           <a

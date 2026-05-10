@@ -34,7 +34,7 @@ export const SERVICES = [
     tag: "Reels · TikToks · Shorts",
     blurb:
       "Daily Reels, TikToks and Shorts for your brand — fully edited, captioned, and ready to post.",
-    img: "https://images.unsplash.com/photo-1626218174358-7769486f0e91?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
+    img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
   },
   {
     n: "04",
@@ -76,7 +76,7 @@ export const WORK = [
     client: "STUDIO MERIDIAN / DTC",
     title: "Doubled organic content, halved cost",
     year: "2025",
-    img: "https://images.unsplash.com/photo-1626218174358-7769486f0e91?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
+    img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400",
   },
   {
     id: "halcyon",
@@ -117,7 +117,7 @@ export const MARQUEE_IMGS = [
 ];
 
 export const HERO_IMG =
-  "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400";
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?crop=entropy&cs=srgb&fm=jpg&q=85&w=1400";
 
 export const REEL_IMG =
   "https://images.unsplash.com/photo-1518709268805-4e9042af2176?crop=entropy&cs=srgb&fm=jpg&q=85&w=2200";
